@@ -1,15 +1,16 @@
 # interval-passing-metric
 A python-written code calculating players/ teams pass completion through 10-minute intervals. This can also be used as a predictive model in performance analysis for quality of passing, fatigue, opponent analysis, accuracy under pressure etc.
-import os
-import xml.etree.ElementTree as ET
-import pandas as pd
-from collections import defaultdict
-time_intervals = [(i, i + 9) for i in range(0, 91, 10)]
-completed_passes = defaultdict(lambda: {interval: 0 for interval in time_intervals})
-unsuccessful_passes = defaultdict(lambda: {interval: 0 for interval in time_intervals})
 
-teams_dir = {}
-def process_xml_file(file_path):
+    import os
+    import xml.etree.ElementTree as ET
+    import pandas as pd
+    from collections import defaultdict
+    time_intervals = [(i, i + 9) for i in range(0, 91, 10)]
+    completed_passes = defaultdict(lambda: {interval: 0 for interval in time_intervals})
+    unsuccessful_passes = defaultdict(lambda: {interval: 0 for interval in time_intervals})
+
+    teams_dir = {}
+    def process_xml_file(file_path):
     tree = ET.parse(file_path)
     root = tree.getroot()
     
@@ -40,27 +41,27 @@ def process_xml_file(file_path):
                     elif outcome == '0':  # Unsuccessful pass
                         unsuccessful_passes[team_id][interval] += 1
                     break
-import os
+    import os
 
-directory = '/Users/user/desktop/F24 La Liga 2023/'
-file_paths = os.listdir(directory)
+    directory = '/Users/user/desktop/F24 La Liga 2023/'
+    file_paths = os.listdir(directory)
 
 
-for file_path in file_paths:
+    for file_path in file_paths:
     file = os.path.join(directory, file_path)
     process_xml_file(file)
-# Pass completion rate for each interval for each team
-pass_completion_rate = defaultdict(dict)
-for team_id in completed_passes:
+    # Pass completion rate for each interval for each team
+    pass_completion_rate = defaultdict(dict)
+    for team_id in completed_passes:
     for interval in time_intervals:
         total_passes = completed_passes[team_id][interval] + unsuccessful_passes[team_id][interval]
         if total_passes > 0:
             pass_completion_rate[team_id][interval] = completed_passes[team_id][interval] / total_passes
         else:
             pass_completion_rate[team_id][interval] = None
-# DataFrames for better visualization
-team_dataframes = {}
-for team_id in pass_completion_rate:
+    # DataFrames for better visualization
+    team_dataframes = {}
+    for team_id in pass_completion_rate:
     data = {
         'Time Interval': [f'{interval[0]}-{interval[1]}' for interval in time_intervals],
         'Completed Passes': [completed_passes[team_id][interval] for interval in time_intervals],
@@ -68,14 +69,14 @@ for team_id in pass_completion_rate:
         'Pass Completion Rate': [pass_completion_rate[team_id][interval] for interval in time_intervals],
     }
     team_dataframes[team_id] = pd.DataFrame(data)
-for team_id, df in team_dataframes.items():
+    for team_id, df in team_dataframes.items():
     print(f"Team {teams_dir[team_id]} Pass Completion Statistics by Interval:")
     print(df)
     print("\n")
-import matplotlib.pyplot as plt
-import pandas as pd
+    import matplotlib.pyplot as plt
+    import pandas as pd
 
-team_dataframes = {
+    team_dataframes = {
     'Athletic Club': pd.DataFrame({
         'Time Interval': ['0-9', '10-19', '20-29', '30-39', '40-49', '50-59', '60-69', '70-79', '80-89', '90-99'],
         'Pass Completion Rate': [0.756588, 0.785564, 0.800413, 0.800900, 0.778899, 0.762983, 0.786418, 0.789245, 0.772118, 0.734831]
@@ -156,10 +157,10 @@ team_dataframes = {
         'Time Interval': ['0-9', '10-19', '20-29', '30-39', '40-49', '50-59', '60-69', '70-79', '80-89', '90-99'],
         'Pass Completion Rate': [0.846522, 0.841179, 0.835197, 0.822196, 0.799657, 0.827492, 0.813278, 0.803347, 0.807922, 0.740668]
     })
-}
+    }  
 
-# Create curve graphs for each team
-for team_name, df in team_dataframes.items():
+    # Create curve graphs for each team
+    for team_name, df in team_dataframes.items():
     plt.figure(figsize=(10, 6))
     plt.plot(df['Time Interval'], df['Pass Completion Rate'], marker='o', linestyle='-')
     plt.title(f"Pass Completion Rate Over Time for Team {team_name}")
